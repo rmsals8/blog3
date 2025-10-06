@@ -70,6 +70,15 @@ define( 'WP_DEBUG', getenv('WORDPRESS_DEBUG') === 'true' ?: false );
 // Use direct filesystem method to avoid FTP prompts during plugin/theme updates
 define( 'FS_METHOD', 'direct' );
 
+// WordPress 사이트 URL 강제 설정 (UI 깨짐 방지)
+define( 'WP_HOME', 'https://port-0-site2-m9aydkxq51acab43.sel4.cloudtype.app' );
+define( 'WP_SITEURL', 'https://port-0-site2-m9aydkxq51acab43.sel4.cloudtype.app' );
+
+// HTTPS 관련 설정
+if ( isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https' ) {
+    $_SERVER['HTTPS'] = 'on';
+}
+
 /* That's all, stop editing! Happy publishing. */
 
 /** Absolute path to the WordPress directory. */
