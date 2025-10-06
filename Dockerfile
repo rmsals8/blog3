@@ -15,6 +15,13 @@ COPY wp-config.php /var/www/html/wp-config.php
 RUN sed -i 's/Listen 80/Listen 8080/' /etc/apache2/ports.conf
 RUN sed -i 's/<VirtualHost \*:80>/<VirtualHost *:8080>/' /etc/apache2/sites-available/000-default.conf
 
+# Apache 모듈/접근 설정
+RUN a2enmod rewrite && \
+    printf "<Directory /var/www/html>\n\tOptions FollowSymLinks\n\tAllowOverride All\n\tRequire all granted\n</Directory>\n" > /etc/apache2/conf-available/wordpress.conf && \
+    a2enconf wordpress && \
+    printf "ServerName localhost\n" > /etc/apache2/conf-available/servername.conf && \
+    a2enconf servername
+
 # 권한 설정 (Apache 설정 후에 실행)
 RUN chown -R www-data:www-data /var/www/html/
 RUN chmod -R 755 /var/www/html/
