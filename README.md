@@ -5,13 +5,12 @@
 ## 구성 요소
 
 - **WordPress**: 최신 WordPress 이미지
-- **MySQL 8.0**: 데이터베이스 서버
-- **phpMyAdmin**: 데이터베이스 관리 도구
+- **Twenty Twelve 테마**: 커스텀 테마 포함
+- **외부 데이터베이스**: CloudType 데이터베이스 사용
 
 ## 사전 요구사항
 
 - Docker
-- Docker Compose
 
 ## 설치 및 실행
 
@@ -21,26 +20,24 @@
 cd C:\projects\simple_blog
 ```
 
-### 2. 환경 변수 설정
-`.env` 파일에서 데이터베이스 설정을 확인하고 필요시 수정하세요:
+### 2. Docker 컨테이너 실행
 
-```env
-MYSQL_DATABASE=wordpress_db
-MYSQL_USER=wordpress_user
-MYSQL_PASSWORD=wordpress_password
-MYSQL_ROOT_PASSWORD=root_password
-```
-
-### 3. Docker 컨테이너 실행
+#### Windows에서 실행:
 ```bash
-# 백그라운드에서 모든 서비스 시작
-docker-compose up -d
+# 실행 스크립트 사용
+run.bat
 
-# 또는 포그라운드에서 실행 (로그 확인용)
-docker-compose up
+# 또는 수동으로 실행
+docker build -t my-wordpress-blog .
+docker run -d --name wordpress-blog -p 8091:80 \
+  -e WORDPRESS_DB_HOST=svc.sel4.cloudtype.app:30333 \
+  -e WORDPRESS_DB_NAME=blog4 \
+  -e WORDPRESS_DB_USER=rmsals \
+  -e WORDPRESS_DB_PASSWORD=1q2w3e \
+  my-wordpress-blog
 ```
 
-### 4. 워드프레스 설정
+### 3. 워드프레스 설정
 1. 웹 브라우저에서 `http://localhost:8091` 접속
 2. 워드프레스 설치 마법사가 나타납니다
 3. 다음 정보로 설정:
@@ -49,24 +46,26 @@ docker-compose up
    - 비밀번호: 강력한 비밀번호
    - 이메일: 관리자 이메일
 
-### 5. phpMyAdmin 접속 (선택사항)
-데이터베이스 관리를 위해 `http://localhost:8090`에서 phpMyAdmin에 접속할 수 있습니다.
+### 4. 테마 활성화
+설치 완료 후:
+1. **관리자 대시보드** → **외모** → **테마**로 이동
+2. **Twenty Twelve** 테마를 찾아서 **활성화** 클릭
 
 ## 서비스 중지
 
 ```bash
-# 모든 서비스 중지
-docker-compose down
+# Windows에서 중지
+stop.bat
 
-# 볼륨까지 삭제 (데이터 완전 삭제)
-docker-compose down -v
+# 또는 수동으로 중지
+docker stop wordpress-blog
+docker rm wordpress-blog
 ```
 
 ## 포트 정보
 
 - **WordPress**: http://localhost:8091
-- **phpMyAdmin**: http://localhost:8090
-- **MySQL**: localhost:3306 (내부 네트워크)
+- **외부 데이터베이스**: svc.sel4.cloudtype.app:30333
 
 ## 데이터 백업
 
