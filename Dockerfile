@@ -46,16 +46,25 @@ RUN mkdir -p /var/www/wordpress/wp-content/uploads && \
     mkdir -p /var/www/wordpress/wp-content/plugins && \
     mkdir -p /var/www/wordpress/wp-content/themes
 
-# 권한 설정 (중요!)
-RUN chown -R www-data:www-data /var/www/wordpress && \
-    find /var/www/wordpress -type d -exec chmod 775 {} + && \
-    find /var/www/wordpress -type f -exec chmod 664 {} +
+# 소유자를 www-data로 변경 (이것이 핵심!)
+RUN chown -R www-data:www-data /var/www/wordpress
 
-# wp-content 폴더는 쓰기 권한 필요
-RUN chmod -R 775 /var/www/wordpress/wp-content
+# 권한 설정: wp-content는 777로 설정하여 완전한 쓰기 권한 부여
+RUN chmod -R 777 /var/www/wordpress/wp-content/uploads && \
+    chmod -R 777 /var/www/wordpress/wp-content/upgrade && \
+    chmod -R 777 /var/www/wordpress/wp-content/plugins && \
+    chmod -R 777 /var/www/wordpress/wp-content/themes
+
+# 나머지 파일들 권한 설정
+RUN find /var/www/wordpress -type d -exec chmod 755 {} + && \
+    find /var/www/wordpress -type f -exec chmod 644 {} +
+
+# wp-content 폴더 전체에 대한 추가 권한 설정
+RUN chmod -R 777 /var/www/wordpress/wp-content
 
 # 워드프레스 파일이 있는지 확인
 RUN ls -la /var/www/wordpress/ && \
+    ls -la /var/www/wordpress/wp-content/ && \
     test -f /var/www/wordpress/index.php || (echo "ERROR: index.php not found!" && exit 1)
 
 # 포트 노출
