@@ -67,6 +67,9 @@ $table_prefix = getenv('WORDPRESS_TABLE_PREFIX') ?: 'wp_';
  */
 define( 'WP_DEBUG', getenv('WORDPRESS_DEBUG') === 'true' ?: false );
 
+// Use direct filesystem method to avoid FTP prompts during plugin/theme updates
+define( 'FS_METHOD', 'direct' );
+
 /* That's all, stop editing! Happy publishing. */
 
 /** Absolute path to the WordPress directory. */
