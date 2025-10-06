@@ -38,5 +38,5 @@ RUN printf '#!/bin/bash\nset -e\n\nif [ ! -e /var/www/html/index.php ]; then\n  
 # 포트 노출
 EXPOSE 8080
 
-# WordPress 시작 (부팅 시 코어 복사 확인 후 Apache 시작)
-CMD ["/usr/local/bin/start-wordpress.sh"]
+# WordPress 시작 (공식 entrypoint가 코어 복사 및 초기화 수행)
+CMD ["apache2-foreground"]
