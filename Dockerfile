@@ -40,6 +40,19 @@ RUN printf "ServerName localhost\n" > /etc/apache2/conf-available/servername.con
 # Apache rewrite 모듈 활성화
 RUN a2enmod rewrite
 
+# .htaccess 파일 생성 (워드프레스 기본 설정)
+RUN printf "# BEGIN WordPress\n\
+<IfModule mod_rewrite.c>\n\
+RewriteEngine On\n\
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%%{HTTP:Authorization}]\n\
+RewriteBase /\n\
+RewriteRule ^index\\.php$ - [L]\n\
+RewriteCond %%{REQUEST_FILENAME} !-f\n\
+RewriteCond %%{REQUEST_FILENAME} !-d\n\
+RewriteRule . /index.php [L]\n\
+</IfModule>\n\
+# END WordPress\n" > /var/www/wordpress/.htaccess
+
 # 워드프레스가 플러그인/테마/업데이트를 설치할 수 있도록 필요한 폴더 생성
 RUN mkdir -p /var/www/wordpress/wp-content/uploads && \
     mkdir -p /var/www/wordpress/wp-content/upgrade && \
@@ -61,6 +74,10 @@ RUN find /var/www/wordpress -type d -exec chmod 755 {} + && \
 
 # wp-content 폴더 전체에 대한 추가 권한 설정
 RUN chmod -R 777 /var/www/wordpress/wp-content
+
+# .htaccess 파일 권한 설정
+RUN chmod 644 /var/www/wordpress/.htaccess && \
+    chown www-data:www-data /var/www/wordpress/.htaccess
 
 # 워드프레스 파일이 있는지 확인
 RUN ls -la /var/www/wordpress/ && \
