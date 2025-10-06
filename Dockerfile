@@ -31,8 +31,12 @@ RUN find /var/www/html -type d -exec chmod 755 {} +
 RUN find /var/www/html -type f -exec chmod 644 {} +
 ## wp-config.php는 런타임에 배치될 수 있으므로 하드 퍼미션 변경은 생략
 
+# 시작 스크립트: 코어가 비어있으면 /usr/src/wordpress에서 복사 후 Apache 실행
+RUN printf '#!/bin/bash\nset -e\n\nif [ ! -e /var/www/html/index.php ]; then\n  echo "[init] Populating /var/www/html with WordPress core..."\n  cp -a /usr/src/wordpress/. /var/www/html/\n  chown -R www-data:www-data /var/www/html\nfi\n\nexec apache2-foreground\n' > /usr/local/bin/start-wordpress.sh && \
+    chmod +x /usr/local/bin/start-wordpress.sh
+
 # 포트 노출
 EXPOSE 8080
 
-# WordPress 시작 (기본 엔트리포인트를 사용하되, index.php가 없을 경우 자동 복사됨)
-CMD ["apache2-foreground"]
+# WordPress 시작 (부팅 시 코어 복사 확인 후 Apache 시작)
+CMD ["/usr/local/bin/start-wordpress.sh"]
