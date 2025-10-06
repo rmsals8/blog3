@@ -5,6 +5,9 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
+# 워드프레스 코어 파일 배치 (컨테이너 시작 스크립트가 건너뛰는 경우 대비)
+RUN rm -rf /var/www/html/* && cp -a /usr/src/wordpress/. /var/www/html/
+
 # 테마 복사
 COPY twentytwelve/ /var/www/html/wp-content/themes/twentytwelve/
 
@@ -17,7 +20,7 @@ RUN sed -i 's/<VirtualHost \*:80>/<VirtualHost *:8080>/' /etc/apache2/sites-avai
 
 # Apache 모듈/접근 설정
 RUN a2enmod rewrite && \
-    printf "<Directory /var/www/html>\n\tOptions FollowSymLinks\n\tAllowOverride All\n\tRequire all granted\n</Directory>\n" > /etc/apache2/conf-available/wordpress.conf && \
+    printf "<Directory /var/www/html>\n\tOptions FollowSymLinks\n\tAllowOverride All\n\tRequire all granted\n\tDirectoryIndex index.php index.html\n</Directory>\n" > /etc/apache2/conf-available/wordpress.conf && \
     a2enconf wordpress && \
     printf "ServerName localhost\n" > /etc/apache2/conf-available/servername.conf && \
     a2enconf servername
