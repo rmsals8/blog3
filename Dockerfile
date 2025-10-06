@@ -40,18 +40,17 @@ RUN printf "ServerName localhost\n" > /etc/apache2/conf-available/servername.con
 # Apache rewrite 모듈 활성화
 RUN a2enmod rewrite
 
-# .htaccess 파일 생성 (워드프레스 기본 설정)
-RUN printf "# BEGIN WordPress\n\
-<IfModule mod_rewrite.c>\n\
-RewriteEngine On\n\
-RewriteRule .* - [E=HTTP_AUTHORIZATION:%%{HTTP:Authorization}]\n\
-RewriteBase /\n\
-RewriteRule ^index\\.php$ - [L]\n\
-RewriteCond %%{REQUEST_FILENAME} !-f\n\
-RewriteCond %%{REQUEST_FILENAME} !-d\n\
-RewriteRule . /index.php [L]\n\
-</IfModule>\n\
-# END WordPress\n" > /var/www/wordpress/.htaccess
+# .htaccess 파일 생성 (간단한 방법 사용)
+RUN echo "# BEGIN WordPress" > /var/www/wordpress/.htaccess && \
+    echo "<IfModule mod_rewrite.c>" >> /var/www/wordpress/.htaccess && \
+    echo "RewriteEngine On" >> /var/www/wordpress/.htaccess && \
+    echo "RewriteBase /" >> /var/www/wordpress/.htaccess && \
+    echo "RewriteRule ^index\\.php$ - [L]" >> /var/www/wordpress/.htaccess && \
+    echo "RewriteCond %{REQUEST_FILENAME} !-f" >> /var/www/wordpress/.htaccess && \
+    echo "RewriteCond %{REQUEST_FILENAME} !-d" >> /var/www/wordpress/.htaccess && \
+    echo "RewriteRule . /index.php [L]" >> /var/www/wordpress/.htaccess && \
+    echo "</IfModule>" >> /var/www/wordpress/.htaccess && \
+    echo "# END WordPress" >> /var/www/wordpress/.htaccess
 
 # 워드프레스가 플러그인/테마/업데이트를 설치할 수 있도록 필요한 폴더 생성
 RUN mkdir -p /var/www/wordpress/wp-content/uploads && \
@@ -82,6 +81,7 @@ RUN chmod 644 /var/www/wordpress/.htaccess && \
 # 워드프레스 파일이 있는지 확인
 RUN ls -la /var/www/wordpress/ && \
     ls -la /var/www/wordpress/wp-content/ && \
+    cat /var/www/wordpress/.htaccess && \
     test -f /var/www/wordpress/index.php || (echo "ERROR: index.php not found!" && exit 1)
 
 # 포트 노출
