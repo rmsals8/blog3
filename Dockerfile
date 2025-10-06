@@ -5,8 +5,8 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# 테마 복사
-COPY twentytwelve/ /var/www/html/wp-content/themes/twentytwelve/
+# 테마 복사 (엔트리포인트가 코어를 복사할 때 함께 적용되도록 소스 위치에 배치)
+COPY twentytwelve/ /usr/src/wordpress/wp-content/themes/twentytwelve/
 
 # wp-config.php 복사 (엔트리포인트가 코어를 복사할 때 함께 적용되도록 소스 위치에도 둔다)
 COPY wp-config.php /usr/src/wordpress/wp-config.php
